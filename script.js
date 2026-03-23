@@ -4,7 +4,8 @@ const timeVal = document.getElementById('timeVal');
 const powerVal = document.getElementById('powerVal');
 const statusVal = document.getElementById('statusVal');
 const lightBtn = document.getElementById('lightBtn');
-const doorBtn = document.getElementById('doorBtn');
+const doorLeftBtn = document.getElementById('doorLeftBtn');
+const doorRightBtn = document.getElementById('doorRightBtn');
 const cam1aBtn = document.getElementById('cam1aBtn');
 const cam1bBtn = document.getElementById('cam1bBtn');
 const startBtn = document.getElementById('startBtn');
@@ -15,7 +16,8 @@ let minute = 0;
 let amPm = 'AM';
 let power = 100;
 let lightOn = false;
-let doorClosed = false;
+let doorLeftClosed = false;
+let doorRightClosed = false;
 let gameOver = false;
 let cameraView = null;
 let cameraActive = false;
@@ -37,9 +39,12 @@ function draw() {
 		ctx.fillStyle = camAnim.active ? '#ff5555' : '#77ff77';
 		ctx.font = '24px monospace';
 		ctx.fillText(`${camAnim.name} distance: ${camAnim.active ? camAnim.distance.toFixed(1) : 'clear'}`, 230, 220);
-		ctx.fillText(`Door: ${doorClosed ? 'Closed' : 'Open'} · Light: ${lightOn ? 'On' : 'Off'}`, 220, 260);
+		const leftState = doorLeftClosed ? 'Closed' : 'Open';
+		const rightState = doorRightClosed ? 'Closed' : 'Open';
+		ctx.fillText(`Doors L:${leftState} R:${rightState} · Light: ${lightOn ? 'On' : 'Off'}`, 190, 260);
 	} else {
-		const target = doorClosed ? '#111' : '#3a1100';
+		const rootState = (doorLeftClosed && doorRightClosed) ? '#111' : '#3a1100';
+		const target = rootState;
 		ctx.fillStyle = target;
 		ctx.fillRect(200, 150, 400, 300);
 
@@ -83,7 +88,8 @@ function draw() {
 		}
 
 		if (a.distance <= 0.15) {
-			if (!doorClosed) {
+			const blocked = (a === animatronics.left && doorLeftClosed) || (a === animatronics.right && doorRightClosed);
+			if (!blocked) {
 				gameOver = true;
 				statusVal.textContent = `Caught by ${a.name}`;
 			} else {
@@ -121,7 +127,8 @@ function gameLoop() {
 	}
 
 	if (lightOn) power -= 0.12;
-	if (doorClosed) power -= 0.18;
+	if (doorLeftClosed) power -= 0.09;
+	if (doorRightClosed) power -= 0.09;
 	if (cameraActive) power -= 0.11;
 	power -= 0.06;
 
@@ -150,10 +157,17 @@ lightBtn.onclick = () => {
 	draw();
 };
 
-doorBtn.onclick = () => {
+doorLeftBtn.onclick = () => {
 	if (!nightActive || gameOver) return;
-	doorClosed = !doorClosed;
-	doorBtn.textContent = doorClosed ? 'Open Door' : 'Close Door';
+	doorLeftClosed = !doorLeftClosed;
+	doorLeftBtn.textContent = doorLeftClosed ? 'Open Left Door' : 'Close Left Door';
+	draw();
+};
+
+doorRightBtn.onclick = () => {
+	if (!nightActive || gameOver) return;
+	doorRightClosed = !doorRightClosed;
+	doorRightBtn.textContent = doorRightClosed ? 'Open Right Door' : 'Close Right Door';
 	draw();
 };
 
