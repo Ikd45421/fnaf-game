@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d');
 const timeVal = document.getElementById('timeVal');
 const powerVal = document.getElementById('powerVal');
 const statusVal = document.getElementById('statusVal');
+const imageList = document.getElementById('imageList');
 const lightBtn = document.getElementById('lightBtn');
 const doorLeftBtn = document.getElementById('doorLeftBtn');
 const doorRightBtn = document.getElementById('doorRightBtn');
@@ -10,11 +11,32 @@ const cam1aBtn = document.getElementById('cam1aBtn');
 const cam1bBtn = document.getElementById('cam1bBtn');
 const startBtn = document.getElementById('startBtn');
 
+// Configurable options (easily changed)
+const config = {
+  startingHour: 12,
+  startingMinute: 0,
+  startingAmPm: 'AM',
+  startingPower: 100,
+  powerDecayPerMinute: 0.06,
+  lightPowerCost: 0.12,
+  doorPowerCost: 0.09,
+  cameraPowerCost: 0.11,
+  winHour: 6,
+  imageFolder: 'images',
+  imageTemplates: {
+    office: 'office.png',
+    camera1a: 'camera1a.png',
+    camera1b: 'camera1b.png',
+    doorLeft: 'door-left.png',
+    doorRight: 'door-right.png'
+  }
+};
+
 let nightActive = false;
-let hour = 12;
-let minute = 0;
-let amPm = 'AM';
-let power = 100;
+let hour = config.startingHour;
+let minute = config.startingMinute;
+let amPm = config.startingAmPm;
+let power = config.startingPower;
 let lightOn = false;
 let doorLeftClosed = false;
 let doorRightClosed = false;
@@ -129,11 +151,11 @@ function gameLoop() {
 		amPm = amPm === 'AM' ? 'PM' : 'AM';
 	}
 
-	if (lightOn) power -= 0.12;
-	if (doorLeftClosed) power -= 0.09;
-	if (doorRightClosed) power -= 0.09;
-	if (cameraActive) power -= 0.11;
-	power -= 0.06;
+	if (lightOn) power -= config.lightPowerCost;
+	if (doorLeftClosed) power -= config.doorPowerCost;
+	if (doorRightClosed) power -= config.doorPowerCost;
+	if (cameraActive) power -= config.cameraPowerCost;
+	power -= config.powerDecayPerMinute;
 
 	if (power <= 0) {
 		power = 0;
@@ -148,6 +170,13 @@ function gameLoop() {
 
 	draw();
 	updateHud();
+}
+
+// Display image asset template list in the UI for easy reference.
+if (imageList) {
+	imageList.textContent = Object.values(config.imageTemplates)
+		.map(file => `${config.imageFolder}/${file}`)
+		.join(', ');
 }
 
 updateHud();
