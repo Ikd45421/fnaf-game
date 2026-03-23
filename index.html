@@ -7,13 +7,40 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div id="game">
-      <canvas id="screen" width="800" height="600"></canvas>
-      <div id="hud">
-        <div id="time">Time: <span id="timeVal">12:00 AM</span></div>
-        <div id="power">Power: <span id="powerVal">100%</span></div>
-        <div id="status">Status: <span id="statusVal">Standby</span></div>
+    <div id="menu" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #000; color: #fff; gap: 1rem;">
+      <h1>FNAF Mini Game</h1>
+      <div id="settingsPanel" style="background:#111; padding:12px; border:1px solid #666; border-radius:8px; text-align:left;">
+        <h2>Settings</h2>
+        <label>Starting hour:<br/><input id="startHourInput" type="number" min="1" max="12" value="12" style="width:80px;"/></label><br/>
+        <label>Starting AM/PM:<br/><select id="startAmPmInput"><option>AM</option><option>PM</option></select></label><br/>
+        <label>Starting power:<br/><input id="startPowerInput" type="number" min="0" max="100" value="100" style="width:80px;"/></label><br/>
+        <label>Power decay / min:<br/><input id="powerDecayInput" type="number" min="0" max="10" step="0.01" value="0.06" style="width:80px;"/></label><br/>
       </div>
+      <button id="playBtn" style="padding:12px 18px; font-size:16px;">Play</button>
+    </div>
+
+    <div id="gameContainer" style="display:none;">
+      <div id="game">
+        <canvas id="screen" width="800" height="600"></canvas>
+        <div id="hud">
+          <div id="time">Time: <span id="timeVal">12:00 AM</span></div>
+          <div id="power">Power: <span id="powerVal">100%</span></div>
+          <div id="status">Status: <span id="statusVal">Standby</span></div>
+        </div>
+        <div id="controls">
+          <button id="lightBtn">Toggle Light</button>
+          <button id="doorLeftBtn">Toggle Left Door</button>
+          <button id="doorRightBtn">Toggle Right Door</button>
+          <button id="cam1aBtn">Camera 1A</button>
+          <button id="cam1bBtn">Camera 1B</button>
+          <button id="startBtn">Start Night</button>
+        </div>
+        <div id="imageAssets" style="margin-top: 10px; font-size: 14px; color: #ccc;">
+          <strong>Image assets:</strong>
+          <span id="imageList">Loading...</span>
+        </div>
+      </div>
+    </div>
       <div id="controls">
         <button id="lightBtn">Toggle Light</button>
         <button id="doorLeftBtn">Toggle Left Door</button>

@@ -10,6 +10,15 @@ const doorRightBtn = document.getElementById('doorRightBtn');
 const cam1aBtn = document.getElementById('cam1aBtn');
 const cam1bBtn = document.getElementById('cam1bBtn');
 const startBtn = document.getElementById('startBtn');
+const menu = document.getElementById('menu');
+const gameContainer = document.getElementById('gameContainer');
+const playBtn = document.getElementById('playBtn');
+const startHourInput = document.getElementById('startHourInput');
+const startAmPmInput = document.getElementById('startAmPmInput');
+const startPowerInput = document.getElementById('startPowerInput');
+const powerDecayInput = document.getElementById('powerDecayInput');
+
+let gameInterval = null;
 
 // Configurable options (easily changed)
 const config = {
@@ -43,6 +52,59 @@ let doorRightClosed = false;
 let gameOver = false;
 let cameraView = null;
 let cameraActive = false;
+
+function applySettingsFromUI() {
+	config.startingHour = Math.min(12, Math.max(1, Number(startHourInput.value) || 12));
+	config.startingAmPm = startAmPmInput.value === 'PM' ? 'PM' : 'AM';
+	config.startingPower = Math.min(100, Math.max(0, Number(startPowerInput.value) || 100));
+	config.powerDecayPerMinute = Math.max(0, Number(powerDecayInput.value) || 0.06);
+
+	hour = config.startingHour;
+	minute = 0;
+	amPm = config.startingAmPm;
+	power = config.startingPower;
+	lightOn = false;
+	doorLeftClosed = false;
+	doorRightClosed = false;
+	gameOver = false;
+	cameraView = null;
+	cameraActive = false;
+	nightActive = false;
+	statusVal.textContent = 'Ready';
+	updateHud();
+	draw();
+}
+
+function showMenu() {
+	menu.style.display = 'flex';
+	gameContainer.style.display = 'none';
+	startBtn.disabled = false;
+	if (gameInterval) {
+		clearInterval(gameInterval);
+		gameInterval = null;
+	}
+	applySettingsFromUI();
+}
+
+function showGame() {
+	menu.style.display = 'none';
+	gameContainer.style.display = 'block';
+}
+
+function startNight() {
+	if (nightActive || gameOver) return;
+
+	applySettingsFromUI();
+	showGame();
+
+	nightActive = true;
+	startBtn.disabled = true;
+	statusVal.textContent = 'Night started';
+
+	if (!gameInterval) {
+		gameInterval = setInterval(gameLoop, 500);
+	}
+}
 
 const animatronics = {
 	left: { name: 'Bonnie', active: false, distance: 3 },
@@ -179,8 +241,7 @@ if (imageList) {
 		.join(', ');
 }
 
-updateHud();
-draw();
+showMenu();
 
 lightBtn.onclick = () => {
 	if (!nightActive || gameOver) return;
@@ -222,9 +283,9 @@ cam1aBtn.onclick = () => setCamera('1A');
 cam1bBtn.onclick = () => setCamera('1B');
 
 startBtn.onclick = () => {
-	if (nightActive) return;
-	nightActive = true;
-	startBtn.disabled = true;
-	statusVal.textContent = 'Night started';
-	setInterval(gameLoop, 500);
+	startNight();
+};
+
+playBtn.onclick = () => {
+	startNight();
 };
