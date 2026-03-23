@@ -14,10 +14,9 @@ Project demo (live): https://ikd45421.github.io/fnaf-game
 
 To deploy manually:
 
-1. Create a GitHub repository named `fnaf-game`.
-2. Push this code to the `main` branch.
-3. In GitHub repo Settings > Pages, set source to `main` branch root.
-4. Wait a minute and open the URL above.
+1. Fork this GitHub repository.
+2. In GitHub repo Settings > Pages, set source to `main` branch root.
+3. Wait a minute and open the URL above.
 
 ## Tutorial
 
