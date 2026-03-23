@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FNAF Mini Game</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="game">
+      <canvas id="screen" width="800" height="600"></canvas>
+      <div id="hud">
+        <div id="time">Time: <span id="timeVal">12:00 AM</span></div>
+        <div id="power">Power: <span id="powerVal">100%</span></div>
+        <div id="status">Status: <span id="statusVal">Standby</span></div>
+      </div>
+      <div id="controls">
+        <button id="lightBtn">Toggle Light</button>
+        <button id="doorBtn">Toggle Door</button>
+        <button id="cam1aBtn">Camera 1A</button>
+        <button id="cam1bBtn">Camera 1B</button>
+        <button id="startBtn">Start Night</button>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

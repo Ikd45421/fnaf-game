@@ -1,0 +1,184 @@
+const canvas = document.getElementById('screen');
+const ctx = canvas.getContext('2d');
+const timeVal = document.getElementById('timeVal');
+const powerVal = document.getElementById('powerVal');
+const statusVal = document.getElementById('statusVal');
+const lightBtn = document.getElementById('lightBtn');
+const doorBtn = document.getElementById('doorBtn');
+const cam1aBtn = document.getElementById('cam1aBtn');
+const cam1bBtn = document.getElementById('cam1bBtn');
+const startBtn = document.getElementById('startBtn');
+
+let nightActive = false;
+let hour = 12;
+let minute = 0;
+let amPm = 'AM';
+let power = 100;
+let lightOn = false;
+let doorClosed = false;
+let gameOver = false;
+let cameraView = null;
+let cameraActive = false;
+
+const animatronics = {
+	left: { name: 'Bonnie', active: false, distance: 3 },
+	right: { name: 'Chica', active: false, distance: 3 }
+};
+
+function draw() {
+	if (cameraActive && cameraView) {
+		ctx.fillStyle = '#101010';
+		ctx.fillRect(160, 120, 480, 360);
+		ctx.fillStyle = '#0f0';
+		ctx.font = '28px monospace';
+		ctx.fillText(`Camera ${cameraView}`, 300, 160);
+
+		const camAnim = cameraView === '1A' ? animatronics.left : animatronics.right;
+		ctx.fillStyle = camAnim.active ? '#ff5555' : '#77ff77';
+		ctx.font = '24px monospace';
+		ctx.fillText(`${camAnim.name} distance: ${camAnim.active ? camAnim.distance.toFixed(1) : 'clear'}`, 230, 220);
+		ctx.fillText(`Door: ${doorClosed ? 'Closed' : 'Open'} · Light: ${lightOn ? 'On' : 'Off'}`, 220, 260);
+	} else {
+		const target = doorClosed ? '#111' : '#3a1100';
+		ctx.fillStyle = target;
+		ctx.fillRect(200, 150, 400, 300);
+
+		ctx.fillStyle = lightOn ? 'rgba(255,255,190,0.6)' : 'rgba(0,0,0,0.6)';
+		ctx.fillRect(230, 180, 340, 240);
+
+		if (animatronics.left.active && animatronics.left.distance <= 1.2) {
+			ctx.fillStyle = '#ff0000';
+			ctx.font = '30px monospace';
+			ctx.fillText('Bonnie at left door!', 220, 330);
+		}
+		if (animatronics.right.active && animatronics.right.distance <= 1.2) {
+			ctx.fillStyle = '#ff0000';
+			ctx.font = '30px monospace';
+			ctx.fillText('Chica at right door!', 220, 370);
+		}
+	}
+
+	if (power <= 0) {
+		power = 0;
+		gameOver = true;
+		statusVal.textContent = 'Out of Power';
+	}
+
+	Object.values(animatronics).forEach(a => {
+		if (!a.active) {
+			if (Math.random() < 0.005) {
+				a.active = true;
+				a.distance = 3;
+			}
+			return;
+		}
+
+		if (cameraActive && ((cameraView === '1A' && a === animatronics.left) || (cameraView === '1B' && a === animatronics.right))) {
+			a.distance = Math.min(3, a.distance + 0.22);
+			if (a.distance > 2.2 && Math.random() < 0.12) {
+				a.active = false;
+			}
+		} else {
+			a.distance = Math.max(0, a.distance - 0.08 - (lightOn ? 0.02 : 0));
+		}
+
+		if (a.distance <= 0.15) {
+			if (!doorClosed) {
+				gameOver = true;
+				statusVal.textContent = `Caught by ${a.name}`;
+			} else {
+				a.distance = 0.7; // blocked by closed door
+			}
+		}
+	});
+}
+
+function updateHud() {
+	timeVal.textContent = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} ${amPm}`;
+	powerVal.textContent = `${Math.max(0, Math.floor(power))}%`;
+	if (gameOver) {
+		statusVal.textContent = 'Bricked';
+	} else if (!nightActive) {
+		statusVal.textContent = 'Idle';
+	} else {
+		statusVal.textContent = cameraActive ? `Cam ${cameraView}` : 'Night Active';
+	}
+}
+
+function gameLoop() {
+	if (!nightActive || gameOver) return;
+
+	minute += 1;
+	if (minute >= 60) {
+		minute = 0;
+		hour += 1;
+	}
+	if (hour > 12) {
+		hour = 1;
+	}
+	if (hour === 12 && minute === 0) {
+		amPm = amPm === 'AM' ? 'PM' : 'AM';
+	}
+
+	if (lightOn) power -= 0.12;
+	if (doorClosed) power -= 0.18;
+	if (cameraActive) power -= 0.11;
+	power -= 0.06;
+
+	if (power <= 0) {
+		power = 0;
+		gameOver = true;
+		statusVal.textContent = 'Out of Power';
+	}
+
+	if (hour === 6 && amPm === 'AM') {
+		gameOver = true;
+		statusVal.textContent = 'Survived!';
+	}
+
+	draw();
+	updateHud();
+}
+
+updateHud();
+draw();
+
+lightBtn.onclick = () => {
+	if (!nightActive || gameOver) return;
+	lightOn = !lightOn;
+	lightBtn.textContent = lightOn ? 'Lights OFF' : 'Lights ON';
+	draw();
+};
+
+doorBtn.onclick = () => {
+	if (!nightActive || gameOver) return;
+	doorClosed = !doorClosed;
+	doorBtn.textContent = doorClosed ? 'Open Door' : 'Close Door';
+	draw();
+};
+
+const setCamera = view => {
+	if (!nightActive || gameOver) return;
+	if (cameraView === view && cameraActive) {
+		cameraActive = false;
+		cameraView = null;
+		cam1aBtn.textContent = 'Camera 1A';
+		cam1bBtn.textContent = 'Camera 1B';
+		return;
+	}
+	cameraActive = true;
+	cameraView = view;
+	cam1aBtn.textContent = view === '1A' ? 'Camera 1A (ON)' : 'Camera 1A';
+	cam1bBtn.textContent = view === '1B' ? 'Camera 1B (ON)' : 'Camera 1B';
+};
+
+cam1aBtn.onclick = () => setCamera('1A');
+cam1bBtn.onclick = () => setCamera('1B');
+
+startBtn.onclick = () => {
+	if (nightActive) return;
+	nightActive = true;
+	startBtn.disabled = true;
+	statusVal.textContent = 'Night started';
+	setInterval(gameLoop, 500);
+};
