@@ -28,12 +28,15 @@ const animatronics = {
 };
 
 function draw() {
+	// Fully clear canvas every frame so camera UI does not persist behind office view
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 	if (cameraActive && cameraView) {
 		ctx.fillStyle = '#101010';
-		ctx.fillRect(160, 120, 480, 360);
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		ctx.fillStyle = '#0f0';
 		ctx.font = '28px monospace';
-		ctx.fillText(`Camera ${cameraView}`, 300, 160);
+		ctx.fillText(`Camera ${cameraView}`, 300, 80);
 
 		const camAnim = cameraView === '1A' ? animatronics.left : animatronics.right;
 		ctx.fillStyle = camAnim.active ? '#ff5555' : '#77ff77';

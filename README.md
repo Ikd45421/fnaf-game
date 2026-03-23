@@ -4,7 +4,7 @@ A simple browser-based night survival game prototype in HTML/CSS/JavaScript.
 
 ## Run
 
-1. Open `index.html` in a browser.
+1. Open `index.html` in a browser. (or just use the github pages link)
 2. Click **Start Night**.
 3. Toggle lights and door to survive until 6:00 AM.
 
@@ -47,4 +47,4 @@ To deploy manually:
 
 ## Notes
 
-- This is a minimal prototype. Extend with images/animations, audio, and difficulty.
+- This is a minimal prototype/beta. Expect a ton of bugs.
